@@ -1,28 +1,14 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics.pairwise import cosine_similarity
+import os
+import pickle
 
-movies = pd.read_csv("Data/movies.csv")
-ratings = pd.read_csv("Data/ratings.csv")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-df = ratings.merge(movies, on="movieId")
+with open(os.path.join(BASE_DIR, "user_movie.pkl"), "rb") as f:
+    user_movie = pickle.load(f)
 
-user_movie = df.pivot_table(
-    index='userId',
-    columns='title',
-    values='rating'
-)
+with open(os.path.join(BASE_DIR, "user_similarity.pkl"), "rb") as f:
+    user_similarity_df = pickle.load(f)
 
-user_movie_filled = user_movie.fillna(0)
-
-user_similarity = cosine_similarity(user_movie_filled)
-
-user_similarity_df = pd.DataFrame(
-    user_similarity,
-    index=user_movie_filled.index,
-    columns=user_movie_filled.index
-)
 
 def recommend_movies(user_id, k=20, n=10, min_ratings=3):
 
@@ -52,8 +38,6 @@ def recommend_movies(user_id, k=20, n=10, min_ratings=3):
         rating_counts[recommendations.index] >= min_ratings
     ]
 
-    # If filtering removes everything,
-    # return the unfiltered recommendations.
     if len(filtered) == 0:
         filtered = recommendations
 
