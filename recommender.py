@@ -42,3 +42,16 @@ def recommend_movies(user_id, k=20, n=10, min_ratings=3):
         filtered = recommendations
 
     return filtered.sort_values(ascending=False).head(n)
+
+
+
+def get_watched_movies(user_id, n=10):
+
+    if user_id not in user_movie.index:
+        return []
+
+    watched = user_movie.loc[user_id].dropna()
+
+    watched = watched.sort_values(ascending=False)
+
+    return watched.head(n).index.tolist()
